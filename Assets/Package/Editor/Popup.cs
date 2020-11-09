@@ -10,8 +10,6 @@ namespace Compopulate
 {
     public class Compopup : EditorWindow
     {
-
-        private const KeyCode hotkey = KeyCode.BackQuote;
         bool close = false;
         public Session session;
 
@@ -44,17 +42,6 @@ namespace Compopulate
         {
             session.CommitAll();
             close = true;
-        }
-
-        public static void ShowSession(Session session)
-        {
-            Compopup window = ScriptableObject.CreateInstance<Compopup>();
-            var main = EditorGUIUtility.GetMainWindowPosition();
-            Vector2 size = new Vector2(200, 200);
-            window.position = new Rect(main.position + (main.size - size) / 2, size);
-            window.session = session;
-            window.ShowPopup();
-            window.OnShow();
         }
 
         private void OnGUI()
