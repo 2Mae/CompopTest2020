@@ -1,0 +1,16 @@
+{
+  "name": "com.toriously.compopulate",
+  "version": "0.0.1",
+  "displayName": "Compopulate",
+  "description": "Auto populate references to components.",
+  "unity": "2020.1",
+  "keywords": [
+    "unity",
+    "editor"
+  ],
+  "author": "Tori",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TTeig/CompopTest2020/tree/main/Assets/Package"
+  }
+}

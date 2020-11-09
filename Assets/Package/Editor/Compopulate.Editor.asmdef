@@ -1,0 +1,15 @@
+{
+    "name": "Compopulate.Editor",
+    "references": [
+        "GUID:51893cd3c5506bc46970b18922f2da78"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
