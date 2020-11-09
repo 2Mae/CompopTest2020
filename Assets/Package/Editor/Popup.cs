@@ -10,17 +10,16 @@ namespace Compopulate
 {
     public class Compopup : EditorWindow
     {
+
         private const KeyCode hotkey = KeyCode.BackQuote;
         bool close = false;
         public Session session;
 
-        [MenuItem("Compopulate/Popup %T")]
+        [MenuItem("Window/Compopulate")]
         public static void ShowWindow()
         {
             Compopup window = ScriptableObject.CreateInstance<Compopup>();
-            var main = EditorGUIUtility.GetMainWindowPosition();
-            Vector2 size = new Vector2(200, 200);
-            window.position = new Rect(main.position + (main.size - size) / 2, size);
+            window.position = new Rect(500, 500, 200, 100);
             window.ShowPopup();
             window.session = new Session(Compopulator.FindFields(Compopulator.FindAllComponents()));
             window.OnShow();

@@ -9,6 +9,7 @@ namespace Compopulate
     {
         public List<ComField> todo = new List<ComField>();
         public List<ComField> done = new List<ComField>();
+        public List<ComField> confirmedNull = new List<ComField>();
 
         public ComField[] fields;
 
@@ -18,10 +19,12 @@ namespace Compopulate
             for (int i = 0; i < fields.Length; i++)
             {
                 var field = fields[i];
-                if (field.expected != field.initial)
-                { todo.Add(field); }
-                else
-                { done.Add(field); }
+
+                if (field.expected != field.initial) { todo.Add(field); }
+                else { done.Add(field); }
+
+                if (field.expected == field.initial && field.expected == null)
+                { confirmedNull.Add(field); }
             }
         }
 
