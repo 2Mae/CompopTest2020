@@ -6,7 +6,7 @@ using UnityEditor;
 
 public class TestMenuItems : MonoBehaviour
 {
-    [UnityEditor.MenuItem("Test/Test Compop %Q")]
+    [UnityEditor.MenuItem("Compopulate/Process all")]
     public static void TestSelection()
     {
         Compopulator.FindAndProcessAll();
