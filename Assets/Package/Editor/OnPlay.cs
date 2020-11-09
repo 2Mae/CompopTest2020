@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Compopulate
 {
@@ -9,16 +10,19 @@ namespace Compopulate
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void OnBeforeSceneLoadRuntimeMethod()
         {
-            var fields = Compopulator.FindFields(GameObject.FindObjectsOfType(typeof(Component)) as Component[]);
-            foreach (var cfield in fields)
-            {
-                if (Compopulator.CanCompop(cfield, out var a, out var b))
-                {
-                    InterruptPlay(() => Compopulator.FindAndProcessAll());
-                    break;
-                }
-            }
+            var fields = Compopulator.FindFields(Compopulator.FindAllComponents());
 
+            Session session = new Session(fields);
+
+            if (session.todo.Count > 0)
+            {
+                //exiting playmode destroys references to fields
+                InterruptPlay(() => Compopup.ShowWindow());
+            }
+            else
+            {
+                EditorWindow.focusedWindow.ShowNotification(new GUIContent("No compopulations"));
+            }
         }
 
         static Action onInterrupted;

@@ -6,28 +6,15 @@ using UnityEngine;
 
 namespace Compopulate
 {
-
-
     public static class Compopulator
     {
-        public struct CField //Todo: Make interface? better name.
-        {
-            public readonly Component component;
-            public readonly FieldInfo fieldInfo;
-            public CField(Component component, FieldInfo fieldInfo)
-            {
-                this.component = component;
-                this.fieldInfo = fieldInfo;
-            }
-        }
-
         public class LogEntry
         {
-            CField field;
+            ComField field;
 
             public bool changed = false;
 
-            public LogEntry(CField field)
+            public LogEntry(ComField field)
             {
                 this.field = field;
             }
@@ -51,11 +38,13 @@ namespace Compopulate
 
         public static Log FindAndProcessAll()
         {
-            Component[] allComponents = GameObject.FindObjectsOfType(typeof(Component)) as Component[];
+            Component[] allComponents = FindAllComponents();
             var log = Compopulator.ProcessComponents(allComponents);
             Debug.Log($"Compopulated {log.changes} fields.");
             return log;
         }
+
+        public static Component[] FindAllComponents() => GameObject.FindObjectsOfType(typeof(Component)) as Component[];
 
         public static Log ProcessComponents(Component[] components)
         {
@@ -68,60 +57,58 @@ namespace Compopulate
             Log log = new Log(entries);
             return log;
         }
-        public static LogEntry[] ProcessFields(CField[] cfields)
+        public static LogEntry[] ProcessFields(ComField[] fields)
         {
-            LogEntry[] logEntries = new LogEntry[cfields.Length];
-            for (int i = 0; i < cfields.Length; i++)
+            LogEntry[] logEntries = new LogEntry[fields.Length];
+            for (int i = 0; i < fields.Length; i++)
             {
-                logEntries[i] = ProcessField(cfields[i]);
+                logEntries[i] = ProcessField(fields[i]);
             }
 
             return logEntries;
         }
 
-        public static bool CanCompop(CField cfield, out Component oldValue, out Component newValue)
+        public static bool CanCompop(ComField field)
         {
-            oldValue = cfield.fieldInfo.GetValue(cfield.component) as Component;
-            newValue = cfield.component.GetComponent(cfield.fieldInfo.FieldType);
-            return (oldValue != newValue);
+            return (field.initial != field.expected);
         }
 
-        public static LogEntry ProcessField(CField cfield)
+        public static LogEntry ProcessField(ComField field)
         {
-            LogEntry log = new LogEntry(cfield);
+            LogEntry log = new LogEntry(field);
 
-            Undo.RecordObject(cfield.component, $"Compopulate: {cfield.component}");
+            Undo.RecordObject(field.component, $"Compopulate: {field.component}");
 
-            if (CanCompop(cfield, out var a, out var b))
+            if (CanCompop(field))
             {
-                cfield.fieldInfo.SetValue(cfield.component, b);
+                field.Commit();
                 log.changed = true;
             }
             return log;
         }
 
-        public static CField[] FindFields(Component[] components)
+        public static ComField[] FindFields(Component[] components)
         {
-            List<CField> cfields = new List<CField>();
+            List<ComField> fields = new List<ComField>();
             for (int i = components.Length - 1; i >= 0; i--)//FORR since list is reverse to hierarchy order by default. //Todo: Confirm this with hierarchies
             {
                 Component component = components[i];
 
                 const BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public; // why these particular flags again?
-                FieldInfo[] fields = component.GetType().GetFields(bindingFlags);
+                FieldInfo[] fieldInfos = component.GetType().GetFields(bindingFlags);
 
-                for (int j = 0; j < fields.Length; j++)
+                for (int j = 0; j < fieldInfos.Length; j++)
                 {
-                    var fieldInfo = fields[j];
+                    var fieldInfo = fieldInfos[j];
 
                     Compop compopulateAttribute = Attribute.GetCustomAttribute(fieldInfo, typeof(Compop)) as Compop;
                     if (compopulateAttribute != null)
                     {
-                        CField cf = new CField(component, fieldInfo);
+                        ComField field = new ComField(component, fieldInfo);
 
                         if (CanCompop(fieldInfo))
                         {
-                            cfields.Add(cf);
+                            fields.Add(field);
                         }
                         else
                         {
@@ -131,7 +118,7 @@ namespace Compopulate
                 }
             }
 
-            return cfields.ToArray();
+            return fields.ToArray();
         }
 
         public static bool CanCompop(FieldInfo fieldInfo)
